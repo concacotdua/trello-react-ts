@@ -1,30 +1,47 @@
-import { Plus } from "lucide-react"
-import { ModeToggle } from "./mode-toggle"
+import { Menu, Plus } from "lucide-react";
+import { ModeToggle } from "./mode-toggle";
+import trelloIcon from "../assets/trello.svg";
+import WorkSpace from "./MenuHeader/WorkSpace";
+import Notification from "./MenuHeader/Notify";
+import AvatarUser from "./MenuHeader/AvatarUser";
+import SearchBar from "./MenuHeader/SearchBar";
+import { Button } from "./ui/button";
 
-interface HeaderProps {
-    title: string
-}
-export default function Header({ title }: HeaderProps) {
-    return (
-        <header className="bg-blue-800/50 p-4">
-            <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4">
-                    <button className="p-2 text-white hover:bg-blue-600/50 rounded">
-                        <span className="sr-only">Menu</span>
-                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
-                        </svg>
-                    </button>
-                    <span className="text-white text-xl font-semibold">{title}</span>
-                </div>
-                <div className="flex items-center space-x-4">
-                    <ModeToggle />
-                    <button className="flex items-center px-3 py-1.5 bg-blue-600 text-white rounded hover:bg-blue-500">
-                        <Plus className="w-4 h-4 mr-2" />
-                        Create
-                    </button>
-                </div>
-            </div>
-        </header>
-    )
+export default function Header() {
+  return (
+    <header className="sticky top-0 z-50 border-b bg-blue-800/95 backdrop-blur supports-[backdrop-filter]:bg-blue-800/60">
+      <div className="flex h-16 items-center justify-between px-4">
+        <div className="flex items-center space-x-4">
+          <button className="block rounded p-2 text-white hover:bg-blue-600/50 md:hidden">
+            <span className="sr-only">Menu</span>
+            <Menu />
+          </button>
+          <div className="hidden flex-shrink-0 items-center space-x-2 md:flex">
+            <img
+              src={trelloIcon}
+              alt="Trello"
+              className="h-6 w-6 rounded-lg bg-green-400"
+            />
+            <span className="font-sans text-xl font-bold text-white">
+              Trello
+            </span>
+          </div>
+          <div className="hidden md:block">
+            <WorkSpace />
+          </div>
+        </div>
+
+        <div className="flex items-center space-x-4">
+          <SearchBar />
+          <ModeToggle />
+          <Button className="flex items-center rounded-lg bg-green-400/70 px-3 py-1.5 font-bold text-white/80 hover:bg-green-700">
+            <Plus className="h-4 w-4" />
+            Create
+          </Button>
+          <Notification />
+          <AvatarUser />
+        </div>
+      </div>
+    </header>
+  );
 }
