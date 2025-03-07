@@ -6,6 +6,7 @@ import { BoardType } from "@/types/data.types";
 
 export default function Boards() {
   const board = mockData.board as unknown as BoardType;
+
   return (
     <div className="flex-shink h-screen overflow-x-auto">
       <div className="min-h-screen bg-background">

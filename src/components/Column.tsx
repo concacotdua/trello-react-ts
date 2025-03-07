@@ -3,6 +3,8 @@ import Card from "./Card";
 import { PackagePlus } from "lucide-react";
 import { ColumnType } from "@/types/data.types";
 import { mapOrder } from "@/utils/sort";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 const Column: FC<ColumnType> = ({
   title,
@@ -10,9 +12,22 @@ const Column: FC<ColumnType> = ({
   cardOrderIds,
   _id,
 }: ColumnType) => {
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({ id: _id, data: { cards, cardOrderIds } });
+  const dndKitColumnStyle = {
+    touchAction: "none", // support mobile drag and drop
+    transform: CSS.Translate.toString(transform),
+    transition,
+  };
   const orderCards = mapOrder(cards, cardOrderIds, "_id");
   return (
-    <div className="w-72 shrink-0 overflow-y-auto rounded-lg border border-border bg-card p-3 shadow-sm">
+    <div
+      className="w-72 shrink-0 overflow-y-auto rounded-lg border border-border bg-card p-3 shadow-sm"
+      ref={setNodeRef}
+      style={dndKitColumnStyle}
+      {...attributes}
+      {...listeners}
+    >
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <h3 className="font-semibold text-card-foreground">{title}</h3>
@@ -29,8 +44,8 @@ const Column: FC<ColumnType> = ({
       </div>
 
       <div className="space-y-2">
-        {cards.map((card) => (
-          <Card {...card} key={card.id} />
+        {orderCards.map((card, index) => (
+          <Card {...card} key={index} />
         ))}
       </div>
 
