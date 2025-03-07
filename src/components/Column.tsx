@@ -1,21 +1,16 @@
 import { FC } from "react";
 import Card from "./Card";
 import { PackagePlus } from "lucide-react";
+import { ColumnType } from "@/types/data.types";
+import { mapOrder } from "@/utils/sort";
 
-interface ColumnProps {
-  title: string;
-  cards: {
-    id: string;
-    title: string;
-    label?: {
-      color: string;
-      text?: string;
-    };
-    commentCount?: number;
-  }[];
-}
-
-const Column: FC<ColumnProps> = ({ title, cards }) => {
+const Column: FC<ColumnType> = ({
+  title,
+  cards,
+  cardOrderIds,
+  _id,
+}: ColumnType) => {
+  const orderCards = mapOrder(cards, cardOrderIds, "_id");
   return (
     <div className="w-72 shrink-0 overflow-y-auto rounded-lg border border-border bg-card p-3 shadow-sm">
       <div className="mb-4 flex items-center justify-between">
@@ -35,7 +30,7 @@ const Column: FC<ColumnProps> = ({ title, cards }) => {
 
       <div className="space-y-2">
         {cards.map((card) => (
-          <Card key={card.id} {...card} />
+          <Card {...card} key={card.id} />
         ))}
       </div>
 
