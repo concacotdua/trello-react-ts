@@ -1,24 +1,32 @@
-import { MessageCircle } from "lucide-react";
+import { CardType } from "@/types/data.types";
+import { MessageCircle, Paperclip, UsersRound } from "lucide-react";
 import { FC } from "react";
+import { Button } from "./ui/button";
 
-interface CardProps {
-  title: string;
+interface CardProps extends CardType {
   label?: {
     color: string;
     text?: string;
   };
-  commentCount?: number;
 }
 
-const Card: FC<CardProps> = ({ title, label, commentCount }) => {
-  const _isVisible = false;
-
+const Card: FC<CardProps> = ({
+  title,
+  cover,
+  memberIds,
+  comments,
+  attachments,
+  label,
+}: CardProps) => {
+  const shouldShowCard = () => {
+    return !!memberIds.length || !!comments.length || !!attachments.length;
+  };
   return (
     <div className="cursor-pointer rounded-md border border-border bg-popover p-3 shadow-sm transition-colors hover:bg-accent/50">
-      {_isVisible && (
-        <div className="h-32 w-full">
+      {cover && (
+        <div className="mb-2 h-32 w-full">
           <img
-            src="https://i.pinimg.com/236x/d4/96/76/d496761128b05abc4aed6a81985c873a.jpg"
+            src={cover}
             alt="avatar"
             className="h-full w-full rounded-lg object-cover"
           />
@@ -44,14 +52,32 @@ const Card: FC<CardProps> = ({ title, label, commentCount }) => {
 
       <p className="text-sm font-medium text-foreground">{title}</p>
 
-      {commentCount !== undefined && commentCount > 0 && (
-        <div className="mt-2 flex items-center gap-1 text-xs text-muted-foreground">
-          <div className="flex items-center rounded bg-muted/50 px-1.5 py-0.5">
-            <MessageCircle className="mr-1 h-4 w-4" />
-            {commentCount}
-          </div>
-        </div>
-      )}
+      <div className="mt-2 flex items-center gap-1 text-xs text-muted-foreground">
+        {shouldShowCard() && (
+          <>
+            {!!memberIds.length && (
+              <Button variant="ghost" size="icon">
+                <UsersRound className="h-4 w-4" />
+                {memberIds.length}
+              </Button>
+            )}
+
+            {!!comments.length && (
+              <div className="flex items-center rounded bg-muted/50 px-1.5 py-0.5">
+                <MessageCircle className="mr-1 h-4 w-4" />
+                {comments.length}
+              </div>
+            )}
+
+            {!!attachments.length && (
+              <div className="flex items-center rounded bg-muted/50 px-1.5 py-0.5">
+                <Paperclip className="mr-1 h-4 w-4" />
+                {attachments.length}
+              </div>
+            )}
+          </>
+        )}
+      </div>
     </div>
   );
 };

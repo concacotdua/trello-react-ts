@@ -2,6 +2,7 @@ import { AvatarCircles } from "@/components/magicui/avatar-circles";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { AVATARS } from "@/constants/data";
+import { BoardType } from "@/types/data.types";
 import {
   HardDrive,
   LayoutDashboard,
@@ -11,6 +12,9 @@ import {
   UserPlus2,
 } from "lucide-react";
 
+export type BoardBarProps = {
+  board?: BoardType;
+};
 const Chip = [
   {
     icon: (
@@ -28,14 +32,14 @@ const Chip = [
   },
   {
     icon: <Repeat className="mr-2 h-5 w-6 flex-shrink fill-green-200" />,
-    label: "Add to Google Drive",
+    label: "Automatic",
   },
   {
     icon: <ListFilter className="mr-2 h-5 w-6 flex-shrink fill-green-200" />,
-    label: "Add to Google Drive",
+    label: "Filter",
   },
 ];
-export default function BoardBar() {
+export default function BoardBar({ board }: BoardBarProps) {
   return (
     <div className="mb-4 w-full overflow-x-auto px-2">
       <div className="grid grid-cols-12 gap-2">
@@ -43,13 +47,20 @@ export default function BoardBar() {
           {Chip.map((item) => {
             return (
               <Badge
+                key={item.label}
                 variant="outline"
                 className="rounded-lg px-4 font-bold capitalize text-green-800/70 hover:bg-black/30"
               >
-                {item.icon}
-                <label className="hidden md:block md:text-xs">
-                  {item.label}
-                </label>
+                {board?.type === "public" ? (
+                  <div className="flex items-center gap-2">
+                    {item.icon}
+                    <label className="hidden md:block md:text-xs">
+                      {item.label}
+                    </label>
+                  </div>
+                ) : (
+                  ""
+                )}
               </Badge>
             );
           })}
