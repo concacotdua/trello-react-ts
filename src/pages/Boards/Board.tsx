@@ -1,13 +1,20 @@
 import Column from "@/components/Column";
 import { Button } from "@/components/ui/button";
-import { SAMPLE_DATA } from "@/constants/data";
 import { PlusCircleIcon } from "lucide-react";
+import { BoardBarProps } from "./BoardBar/BoardBar";
+import { mapOrder } from "@/utils/sort";
+import { ColumnType } from "@/types/data.types";
 
-export default function Board() {
+export default function Board({ board }: BoardBarProps) {
+  const orderColumns = mapOrder(
+    board?.columns as unknown as ColumnType[],
+    board?.columnOrderIds as string[],
+    "_id",
+  );
   return (
     <div className="flex space-x-4 overflow-x-auto pb-4">
-      {SAMPLE_DATA.columns.map((column, index) => (
-        <Column key={index} {...column} />
+      {orderColumns.map((column) => (
+        <Column {...column} key={column._id} />
       ))}
       <div className="flex-col">
         <Button
