@@ -1,11 +1,10 @@
-import { Menu, Plus } from "lucide-react";
+import { Menu } from "lucide-react";
 import { ModeToggle } from "./mode-toggle";
 import trelloIcon from "../assets/trello.svg";
 import WorkSpace from "./MenuHeader/WorkSpace";
 import Notification from "./MenuHeader/Notify";
 import AvatarUser from "./MenuHeader/AvatarUser";
 import SearchBar from "./MenuHeader/SearchBar";
-import { Button } from "./ui/button";
 
 export default function Header() {
   return (
@@ -34,10 +33,6 @@ export default function Header() {
         <div className="flex items-center space-x-4">
           <SearchBar />
           <ModeToggle />
-          <Button className="flex items-center rounded-lg bg-green-400/70 px-3 py-1.5 font-bold text-white/80 hover:bg-green-700">
-            <Plus className="h-4 w-4" />
-            Create
-          </Button>
           <Notification />
           <AvatarUser />
         </div>

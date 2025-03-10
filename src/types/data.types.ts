@@ -7,7 +7,7 @@ export type ColumnType = {
 };
 
 export type CardType = {
-  id: string;
+  _id: string;
   boardId: string;
   columnId: string;
   title: string;

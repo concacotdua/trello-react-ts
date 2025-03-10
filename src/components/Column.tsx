@@ -1,58 +1,107 @@
 import { FC } from "react";
 import Card from "./Card";
-import { PackagePlus } from "lucide-react";
+import { MoreHorizontal, Plus } from "lucide-react";
 import { ColumnType } from "@/types/data.types";
 import { mapOrder } from "@/utils/sort";
-import { useSortable } from "@dnd-kit/sortable";
+import {
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
+import { Button } from "./ui/button";
+import { cn } from "@/lib/utils";
 
-const Column: FC<ColumnType> = ({
-  title,
-  cards,
-  cardOrderIds,
-  _id,
-}: ColumnType) => {
-  const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({ id: _id, data: { cards, cardOrderIds } });
+const Column: FC<ColumnType> = ({ ...column }: ColumnType) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: column._id, data: { ...column } });
+
   const dndKitColumnStyle = {
-    touchAction: "none", // support mobile drag and drop
+    touchAction: "none",
     transform: CSS.Translate.toString(transform),
     transition,
+    height: "100%",
   };
-  const orderCards = mapOrder(cards, cardOrderIds, "_id");
+
+  const orderCards = mapOrder(column.cards, column.cardOrderIds, "_id");
+
   return (
     <div
-      className="w-72 shrink-0 overflow-y-auto rounded-lg border border-border bg-card p-3 shadow-sm"
       ref={setNodeRef}
       style={dndKitColumnStyle}
-      {...attributes}
       {...listeners}
+      {...attributes}
+      className={cn(
+        "flex h-full max-h-[calc(100vh-10rem)] w-[280px] shrink-0 flex-col rounded-lg border bg-card/95 p-2 md:w-72 md:p-3",
+        isDragging && "opacity-50",
+      )}
     >
-      <div className="mb-4 flex items-center justify-between">
+      <div className="flex items-center justify-between pb-2 md:pb-3">
         <div className="flex items-center gap-2">
-          <h3 className="font-semibold text-card-foreground">{title}</h3>
-          <span className="text-sm text-muted-foreground">
-            ({cards.length})
+          <h3 className="text-sm font-semibold text-foreground">
+            {column.title}
+          </h3>
+          <span className="rounded bg-muted px-1.5 py-0.5 text-xs text-muted-foreground md:px-2">
+            {column.cards.length}
           </span>
         </div>
-        <button className="text-muted-foreground hover:text-card-foreground">
-          <span className="sr-only">More options</span>
-          <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
-          </svg>
-        </button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7 text-muted-foreground opacity-0 group-hover:opacity-100 md:h-8 md:w-8"
+            >
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuItem>Add card...</DropdownMenuItem>
+            <DropdownMenuItem>Copy list...</DropdownMenuItem>
+            <DropdownMenuItem>Move list...</DropdownMenuItem>
+            <DropdownMenuItem>Watch</DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem className="text-destructive">
+              Archive this list
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
-      <div className="space-y-2">
-        {orderCards.map((card, index) => (
-          <Card {...card} key={index} />
-        ))}
+      <div className="custom-scrollbar flex-1 overflow-y-auto overflow-x-hidden">
+        <div className="space-y-2 pb-2">
+          <SortableContext
+            items={orderCards.map((c) => c._id)}
+            strategy={verticalListSortingStrategy}
+          >
+            {orderCards.map((card) => (
+              <Card key={card._id} {...card} />
+            ))}
+          </SortableContext>
+        </div>
       </div>
 
-      <button className="mt-2 flex w-full items-center gap-2 rounded px-2 py-2 text-left text-muted-foreground hover:bg-accent/50 hover:text-card-foreground">
-        <PackagePlus className="h-5 w-5" />
+      <Button
+        variant="ghost"
+        size="sm"
+        className="mt-2 w-full justify-start text-muted-foreground hover:bg-accent hover:text-foreground"
+      >
+        <Plus className="mr-2 h-4 w-4" />
         Add a card
-      </button>
+      </Button>
     </div>
   );
 };
