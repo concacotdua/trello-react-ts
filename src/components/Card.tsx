@@ -27,6 +27,7 @@ const Card: FC<CardType> = ({ _id, ...card }: CardType) => {
     transform: CSS.Translate.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,
+    border: isDragging ? "1px solid #63f267" : undefined,
   };
 
   const shouldShowCard = () => {
@@ -50,7 +51,7 @@ const Card: FC<CardType> = ({ _id, ...card }: CardType) => {
       {/* Drag Handle */}
       <div
         {...listeners}
-        className="absolute -left-2 top-1/2 flex h-10 w-6 -translate-y-1/2 items-center justify-center opacity-0 group-hover:opacity-100"
+        className="absolute right-0 top-1/2 flex h-10 w-6 -translate-y-1/2 items-center justify-center opacity-0 group-hover:opacity-100"
       >
         <GripVertical className="h-4 w-4 text-muted-foreground" />
       </div>

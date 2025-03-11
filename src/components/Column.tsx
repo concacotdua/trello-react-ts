@@ -63,7 +63,7 @@ const Column: FC<ColumnType> = ({ ...column }: ColumnType) => {
             <Button
               variant="ghost"
               size="icon"
-              className="h-7 w-7 text-muted-foreground opacity-0 group-hover:opacity-100 md:h-8 md:w-8"
+              className="h-7 w-7 text-muted-foreground opacity-80 group-hover:opacity-100 md:h-8 md:w-8"
             >
               <MoreHorizontal className="h-4 w-4" />
             </Button>
@@ -82,13 +82,15 @@ const Column: FC<ColumnType> = ({ ...column }: ColumnType) => {
       </div>
 
       <div className="custom-scrollbar flex-1 overflow-y-auto overflow-x-hidden">
-        <div className="space-y-2 pb-2">
+        <div className="space-y-4 pb-2">
           <SortableContext
             items={orderCards.map((c) => c._id)}
             strategy={verticalListSortingStrategy}
           >
             {orderCards.map((card) => (
-              <Card key={card._id} {...card} />
+              <div key={card._id}>
+                <Card {...card} />
+              </div>
             ))}
           </SortableContext>
         </div>
