@@ -60,6 +60,7 @@ const Card: FC<CardType> = ({
       <div
         {...listeners}
         className="absolute right-0 top-1/2 flex h-10 w-6 -translate-y-1/2 cursor-grab items-center justify-center opacity-0 group-hover:opacity-100"
+
       >
         <GripVertical className="h-4 w-4 text-muted-foreground" />
       </div>

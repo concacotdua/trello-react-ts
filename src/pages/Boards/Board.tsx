@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
+
 import {
   SortableContext,
   arrayMove,
@@ -32,7 +33,7 @@ import { cloneDeep } from "lodash";
 
 export default function Board({ board }: BoardBarProps) {
   const [orderedColumns, setOrderedColumns] = useState<ColumnType[]>([]);
-  const [activeDragItemId, setActiveDragItemId] =
+const [activeDragItemId, setActiveDragItemId] =
     useState<UniqueIdentifier | null>(null);
   const [activeDragItemType, setActiveDragItemType] = useState<string | null>(
     null,
@@ -68,7 +69,7 @@ export default function Board({ board }: BoardBarProps) {
     setOrderedColumns(ordered);
   }, [board]);
 
-  const findColumnByCardId = (cardId: string): ColumnType | null => {
+const findColumnByCardId = (cardId: string): ColumnType | null => {
     return (
       orderedColumns.find((c) => c.cards.some((card) => card._id === cardId)) ||
       null
@@ -81,7 +82,7 @@ export default function Board({ board }: BoardBarProps) {
     setActiveDragItemType(
       isCard ? ACTIVE_DRAG_ITEM_TYPE.CARD : ACTIVE_DRAG_ITEM_TYPE.COLUMN,
     );
-    setActiveDragItemData(event.active.data.current as CardType | ColumnType);
+setActiveDragItemData(event.active.data.current as CardType | ColumnType);
     if (isCard) {
       const oldColumn = findColumnByCardId(event.active.id as string);
       setOldColumnDragCard(oldColumn || null);
@@ -100,6 +101,8 @@ export default function Board({ board }: BoardBarProps) {
     const { id: overCardId } = over;
     const activeColumn = findColumnByCardId(activeDraggingCardId as string);
     const overColumn = findColumnByCardId(overCardId as string);
+console.log("activeColumn", activeColumn);
+    console.log("overColumn", overColumn);
 
     if (!activeColumn || !overColumn) return;
 
@@ -149,7 +152,7 @@ export default function Board({ board }: BoardBarProps) {
             0,
             activeDraggingCardData as CardType,
           );
-          console.log("🛠 Sau khi thêm card:", nextOverColumn.cards.length);
+console.log("🛠 Sau khi thêm card:", nextOverColumn.cards.length);
           nextOverColumn.cardOrderIds = nextOverColumn.cards.map(
             (card) => card._id,
           );
@@ -158,14 +161,13 @@ export default function Board({ board }: BoardBarProps) {
           console.warn("⚠️ Không tìm thấy nextOverColumn, bỏ qua cập nhật!");
           return prevColumns;
         }
-
         return nextColumns;
       });
     }
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
+const { active, over } = event;
     console.log("🔍 handleDragEnd - Active:", active);
     console.log("🔍 handleDragEnd - Over:", over);
 
@@ -334,8 +336,8 @@ export default function Board({ board }: BoardBarProps) {
         strategy={horizontalListSortingStrategy}
       >
         <div className="flex space-x-4 overflow-x-auto pb-4">
-          {orderedColumns.map((column) => (
-            <Column {...column} key={column._id} />
+          {orderedColumns.map((column, index) => (
+            <Column {...column} key={index} />
           ))}
           <div className="flex-col">
             <Button
@@ -356,7 +358,7 @@ export default function Board({ board }: BoardBarProps) {
           )}
         {activeDragItemType === ACTIVE_DRAG_ITEM_TYPE.CARD &&
           activeDragItemData && (
-            <div>
+ <div>
               <Card
                 key={String((activeDragItemData as CardType)._id)}
                 {...(activeDragItemData as CardType)}

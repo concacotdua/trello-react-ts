@@ -92,7 +92,7 @@ const Column: FC<ColumnType> = ({ ...column }: ColumnType) => {
       </div>
 
       <div className="custom-scrollbar flex-1 overflow-y-auto overflow-x-hidden">
-        <SortableContext items={cardIds} strategy={verticalListSortingStrategy}>
+<SortableContext items={cardIds} strategy={verticalListSortingStrategy}>
           {orderCards.map((card) => (
             <div className="mb-4 last:mb-0">
               <Card {...card} key={card._id} />
