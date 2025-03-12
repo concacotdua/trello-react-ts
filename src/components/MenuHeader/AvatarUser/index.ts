@@ -1,3 +1,3 @@
-import AvatarUser from "./AvatarUser";
+import AvatarUser from './AvatarUser'
 
-export default AvatarUser;
+export default AvatarUser

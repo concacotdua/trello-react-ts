@@ -1,3 +1,3 @@
-import BoardBar from "./BoardBar";
+import BoardBar from './BoardBar'
 
-export default BoardBar;
+export default BoardBar

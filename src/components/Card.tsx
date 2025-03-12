@@ -12,7 +12,16 @@ import {
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
-const Card: FC<CardType> = ({ _id, ...card }: CardType) => {
+const Card: FC<CardType> = ({
+  _id,
+  attachments,
+  columnId,
+  comments,
+  boardId,
+  cover,
+  memberIds,
+  title,
+}: CardType) => {
   const {
     attributes,
     listeners,
@@ -20,7 +29,10 @@ const Card: FC<CardType> = ({ _id, ...card }: CardType) => {
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: _id, data: { ...card, columnId: card.columnId } });
+  } = useSortable({
+    id: _id,
+    data: { _id, attachments, columnId, comments, cover, memberIds, title },
+  });
 
   const dndCardStyle = {
     touchAction: "none",
@@ -31,11 +43,7 @@ const Card: FC<CardType> = ({ _id, ...card }: CardType) => {
   };
 
   const shouldShowCard = () => {
-    return (
-      !!card.memberIds.length ||
-      !!card.comments.length ||
-      !!card.attachments.length
-    );
+    return !!memberIds.length || !!comments.length || !!attachments.length;
   };
 
   return (
@@ -51,15 +59,16 @@ const Card: FC<CardType> = ({ _id, ...card }: CardType) => {
       {/* Drag Handle */}
       <div
         {...listeners}
-        className="absolute right-0 top-1/2 flex h-10 w-6 -translate-y-1/2 items-center justify-center opacity-0 group-hover:opacity-100"
+        className="absolute right-0 top-1/2 flex h-10 w-6 -translate-y-1/2 cursor-grab items-center justify-center opacity-0 group-hover:opacity-100"
+
       >
         <GripVertical className="h-4 w-4 text-muted-foreground" />
       </div>
 
-      {card.cover && (
+      {cover && (
         <div className="mb-2 h-24 w-full overflow-hidden rounded-md md:h-32">
           <img
-            src={card.cover}
+            src={cover}
             alt="cover"
             className="h-full w-full object-cover"
             draggable={false}
@@ -68,14 +77,14 @@ const Card: FC<CardType> = ({ _id, ...card }: CardType) => {
       )}
 
       <p className="line-clamp-3 text-sm font-medium text-foreground">
-        {card.title}
+        {title}
       </p>
 
       {shouldShowCard() && (
         <div className="mt-2 flex items-center justify-between md:mt-3">
           <div className="flex -space-x-1.5 md:-space-x-2">
             <TooltipProvider>
-              {card.memberIds.map((member, index) => (
+              {memberIds.map((member, index) => (
                 <Tooltip key={index}>
                   <TooltipTrigger asChild>
                     <Avatar
@@ -100,16 +109,16 @@ const Card: FC<CardType> = ({ _id, ...card }: CardType) => {
           </div>
 
           <div className="flex items-center gap-2 text-[10px] text-muted-foreground md:text-xs">
-            {!!card.comments.length && (
+            {!!comments.length && (
               <div className="flex select-none items-center rounded bg-muted px-1.5 py-0.5">
                 <MessageCircle className="mr-1 h-3 w-3 md:h-3.5 md:w-3.5" />
-                {card.comments.length}
+                {comments.length}
               </div>
             )}
-            {!!card.attachments.length && (
+            {!!attachments.length && (
               <div className="flex select-none items-center rounded bg-muted px-1.5 py-0.5">
                 <Paperclip className="mr-1 h-3 w-3 md:h-3.5 md:w-3.5" />
-                {card.attachments.length}
+                {attachments.length}
               </div>
             )}
           </div>

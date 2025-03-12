@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useMemo } from "react";
 import Card from "./Card";
 import { MoreHorizontal, Plus } from "lucide-react";
 import { ColumnType } from "@/types/data.types";
@@ -36,7 +36,17 @@ const Column: FC<ColumnType> = ({ ...column }: ColumnType) => {
     height: "100%",
   };
 
-  const orderCards = mapOrder(column.cards, column.cardOrderIds, "_id");
+  // Use useMemo to prevent unnecessary re-ordering on each render
+  const orderCards = useMemo(
+    () => mapOrder(column.cards, column.cardOrderIds, "_id"),
+    [column.cards, column.cardOrderIds],
+  );
+
+  // Create a stable array of card IDs for SortableContext
+  const cardIds = useMemo(
+    () => orderCards.map((card) => card._id),
+    [orderCards],
+  );
 
   return (
     <div
@@ -82,18 +92,15 @@ const Column: FC<ColumnType> = ({ ...column }: ColumnType) => {
       </div>
 
       <div className="custom-scrollbar flex-1 overflow-y-auto overflow-x-hidden">
-        <div className="space-y-4 pb-2">
-          <SortableContext
-            items={orderCards.map((c) => c._id)}
-            strategy={verticalListSortingStrategy}
-          >
-            {orderCards.map((card) => (
-              <div key={card._id}>
-                <Card {...card} />
-              </div>
-            ))}
-          </SortableContext>
-        </div>
+<SortableContext items={cardIds} strategy={verticalListSortingStrategy}>
+          {orderCards.map((card) => (
+            <div className="mb-4 last:mb-0">
+              <Card {...card} key={card._id} />
+            </div>
+          ))}
+        </SortableContext>
+        {/* Empty div for drop space */}
+        <div className="h-2 w-full" aria-hidden="true" />
       </div>
 
       <Button
