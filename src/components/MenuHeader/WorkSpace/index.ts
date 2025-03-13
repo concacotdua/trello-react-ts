@@ -1,3 +1,3 @@
-import WorkSpace from "./WorkSpace";
+import WorkSpace from './WorkSpace'
 
-export default WorkSpace;
+export default WorkSpace

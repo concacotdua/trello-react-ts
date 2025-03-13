@@ -1,11 +1,11 @@
-import Boards from "./pages/Boards";
+import Boards from './pages/Boards'
 
 function App() {
   return (
     <div>
       <Boards />
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
