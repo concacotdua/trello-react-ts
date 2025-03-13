@@ -17,10 +17,10 @@ const Card: FC<CardType> = ({
   attachments,
   columnId,
   comments,
-  boardId,
   cover,
   memberIds,
   title,
+  FE_placeholderCard,
 }: CardType) => {
   const {
     attributes,
@@ -31,7 +31,16 @@ const Card: FC<CardType> = ({
     isDragging,
   } = useSortable({
     id: _id,
-    data: { _id, attachments, columnId, comments, cover, memberIds, title },
+    data: {
+      _id,
+      attachments,
+      columnId,
+      comments,
+      cover,
+      memberIds,
+      title,
+      FE_placeholderCard,
+    },
   });
 
   const dndCardStyle = {
@@ -51,18 +60,19 @@ const Card: FC<CardType> = ({
       className={cn(
         "group relative rounded-md border bg-card p-2 md:p-3",
         "shadow-sm",
+        FE_placeholderCard ? "hidden" : "block",
       )}
       ref={setNodeRef}
       style={dndCardStyle}
       {...attributes}
+      {...listeners}
     >
       {/* Drag Handle */}
-      <div
-        {...listeners}
+      {/* <div
         className="absolute right-0 top-1/2 flex h-10 w-6 -translate-y-1/2 cursor-grab items-center justify-center opacity-0 group-hover:opacity-100"
       >
         <GripVertical className="h-4 w-4 text-muted-foreground" />
-      </div>
+      </div> */}
 
       {cover && (
         <div className="mb-2 h-24 w-full overflow-hidden rounded-md md:h-32">

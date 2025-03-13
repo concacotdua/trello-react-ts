@@ -19,7 +19,12 @@ import {
 import { Button } from "./ui/button";
 import { cn } from "@/lib/utils";
 
-const Column: FC<ColumnType> = ({ ...column }: ColumnType) => {
+const Column: FC<ColumnType> = ({
+  cards,
+  cardOrderIds,
+  _id,
+  title,
+}: ColumnType) => {
   const {
     attributes,
     listeners,
@@ -27,7 +32,7 @@ const Column: FC<ColumnType> = ({ ...column }: ColumnType) => {
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: column._id, data: { ...column } });
+  } = useSortable({ id: _id, data: { cards, cardOrderIds, _id, title } });
 
   const dndKitColumnStyle = {
     touchAction: "none",
@@ -38,14 +43,8 @@ const Column: FC<ColumnType> = ({ ...column }: ColumnType) => {
 
   // Use useMemo to prevent unnecessary re-ordering on each render
   const orderCards = useMemo(
-    () => mapOrder(column.cards, column.cardOrderIds, "_id"),
-    [column.cards, column.cardOrderIds],
-  );
-
-  // Create a stable array of card IDs for SortableContext
-  const cardIds = useMemo(
-    () => orderCards.map((card) => card._id),
-    [orderCards],
+    () => mapOrder(cards, cardOrderIds, "_id"),
+    [cards, cardOrderIds],
   );
 
   return (
@@ -61,11 +60,11 @@ const Column: FC<ColumnType> = ({ ...column }: ColumnType) => {
     >
       <div className="flex items-center justify-between pb-2 md:pb-3">
         <div className="flex items-center gap-2">
-          <h3 className="text-sm font-semibold text-foreground">
-            {column.title}
-          </h3>
+          <h3 className="text-sm font-semibold text-foreground">{title}</h3>
           <span className="rounded bg-muted px-1.5 py-0.5 text-xs text-muted-foreground md:px-2">
-            {column.cards.length}
+            {cards.filter((card) => card.FE_placeholderCard).length === 1
+              ? "0"
+              : cards.length}
           </span>
         </div>
         <DropdownMenu>
@@ -92,10 +91,13 @@ const Column: FC<ColumnType> = ({ ...column }: ColumnType) => {
       </div>
 
       <div className="custom-scrollbar flex-1 overflow-y-auto overflow-x-hidden">
-        <SortableContext items={cardIds} strategy={verticalListSortingStrategy}>
+        <SortableContext
+          items={orderCards.map((card) => card._id)}
+          strategy={verticalListSortingStrategy}
+        >
           {orderCards.map((card) => (
-            <div className="mb-4 last:mb-0">
-              <Card {...card} key={card._id} />
+            <div className="mb-3 last:mb-0" key={card._id}>
+              <Card {...card} />
             </div>
           ))}
         </SortableContext>
