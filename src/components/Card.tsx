@@ -66,13 +66,14 @@ const Card: FC<CardType> = ({
       style={dndCardStyle}
       {...attributes}
       {...listeners}
+      {...listeners}
     >
       {/* Drag Handle */}
       {/* <div
         className="absolute right-0 top-1/2 flex h-10 w-6 -translate-y-1/2 cursor-grab items-center justify-center opacity-0 group-hover:opacity-100"
       >
         <GripVertical className="h-4 w-4 text-muted-foreground" />
-      </div> */}
+      </div>  */}
 
       {cover && (
         <div className="mb-2 h-24 w-full overflow-hidden rounded-md md:h-32">
