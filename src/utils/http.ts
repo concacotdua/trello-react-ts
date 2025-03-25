@@ -5,7 +5,7 @@ class Http {
 
   constructor() {
     this.instance = axios.create({
-      baseURL: 'https://638e30fa7220b48a60e2a64d.mockapi.io',
+      baseURL: 'http://localhost:8080',
       timeout: 10000,
       headers: {
         'Content-Type': 'application/json'

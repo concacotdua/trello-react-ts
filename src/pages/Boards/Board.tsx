@@ -5,8 +5,6 @@ import {
   UniqueIdentifier,
   useSensor,
   useSensors,
-  MouseSensor,
-  TouchSensor,
   DragEndEvent,
   DragStartEvent,
   DragOverlay,
@@ -20,7 +18,8 @@ import {
   Active,
   Over
 } from '@dnd-kit/core'
-import { PlusCircleIcon } from 'lucide-react'
+import { MouseSensor, TouchSensor } from '@/customs/DndKitSensors'
+import { PlusCircleIcon, X } from 'lucide-react'
 
 import Column from '@/components/Column'
 import { Button } from '@/components/ui/button'
@@ -31,6 +30,8 @@ import { ACTIVE_DRAG_ITEM_TYPE } from '@/constants/active'
 import Card from '@/components/Card'
 import { cloneDeep, isEmpty } from 'lodash'
 import { generatePlaceholderCard } from '@/utils/formattext'
+import { Input } from '@/components/ui/input'
+import { toast } from 'react-toastify'
 
 export default function Board({ board }: BoardBarProps) {
   const [orderedColumns, setOrderedColumns] = useState<ColumnType[]>([])
@@ -38,6 +39,17 @@ export default function Board({ board }: BoardBarProps) {
   const [activeDragItemType, setActiveDragItemType] = useState<string | null>(null)
   const [activeDragItemData, setActiveDragItemData] = useState<CardType | ColumnType | null>(null)
   const [oldColumnDragCard, setOldColumnDragCard] = useState<ColumnType | null>(null)
+  const [openNewColumnForm, setOpenNewColumnForm] = useState(false)
+  const [newColumnTitle, setNewColumnTitle] = useState('')
+  const toggleNewColumnForm = () => setOpenNewColumnForm(!openNewColumnForm)
+  const addNewColumnTitle = () => {
+    if (!newColumnTitle) {
+      toast.error('Please enter a title for the new column')
+      return
+    }
+    toggleNewColumnForm()
+    setNewColumnTitle('')
+  }
 
   const mouseSensor = useSensor(MouseSensor, {
     activationConstraint: {
@@ -258,11 +270,39 @@ export default function Board({ board }: BoardBarProps) {
           {orderedColumns.map((column) => (
             <Column {...column} key={column._id} />
           ))}
-          <div className='flex-col'>
-            <Button variant='outline' className='bg-slate-500/50 hover:bg-slate-700/50'>
-              <PlusCircleIcon className='h-4 w-4' />
-              Add new column
-            </Button>
+          <div className='flex-col mt-2'>
+            {openNewColumnForm ? (
+              <>
+                <div className='flex items-center gap-2'>
+                  <Input
+                    type='text'
+                    placeholder='Enter a title for this card...'
+                    autoFocus
+                    data-no-dnd='true'
+                    className='hover:border-green-400 hover:text-green-400'
+                    value={newColumnTitle}
+                    onChange={(e) => setNewColumnTitle(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        addNewColumnTitle()
+                      }
+                      if (e.key === 'Escape') {
+                        toggleNewColumnForm()
+                      }
+                    }}
+                  />
+                  <X className='size-6 cursor-pointer text-gray-600 hover:text-gray-800 transition-all duration-300 ease-in-out hover:rotate-90 hover:scale-110' onClick={toggleNewColumnForm} />
+                  <Button variant='outline' className='h-8 w-24 hover:border-green-400 hover:text-green-400' onClick={addNewColumnTitle}>
+                    add column
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <Button variant='outline' className='max-w-[250px] bg-slate-500/50 hover:bg-slate-700/50 transition-all duration-300 ease-in-out transform hover:scale-105' onClick={toggleNewColumnForm}>
+                <PlusCircleIcon className='size-4' />
+                Add new column
+              </Button>
+            )}
           </div>
         </div>
       </SortableContext>
