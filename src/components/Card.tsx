@@ -1,13 +1,12 @@
 import { CardType } from '@/types/data.types'
 import { MessageCircle, Paperclip, GripVertical } from 'lucide-react'
-import { FC } from 'react'
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
 import { cn } from '@/lib/utils'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 
-const Card: FC<CardType> = ({ _id, attachments, columnId, comments, cover, memberIds, title, FE_placeholderCard }: CardType) => {
+const Card = ({ _id, attachments, columnId, comments, cover, memberIds, title, FE_placeholderCard }: CardType) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: _id,
     data: {
@@ -30,9 +29,9 @@ const Card: FC<CardType> = ({ _id, attachments, columnId, comments, cover, membe
     border: isDragging ? '1px solid #63f267' : undefined
   }
 
-  const shouldShowCard = () => {
-    return !!memberIds.length || !!comments.length || !!attachments.length
-  }
+  // const shouldShowCard = () => {
+  //   return !!memberIds.length || !!comments.length || !!attachments.length
+  // }
 
   return (
     <div
@@ -58,7 +57,7 @@ const Card: FC<CardType> = ({ _id, attachments, columnId, comments, cover, membe
 
       <p className='line-clamp-3 text-sm font-medium text-foreground'>{title}</p>
 
-      {shouldShowCard() && (
+      {/* {shouldShowCard() && (
         <div className='mt-2 flex items-center justify-between md:mt-3'>
           <div className='flex -space-x-1.5 md:-space-x-2'>
             <TooltipProvider>
@@ -93,7 +92,7 @@ const Card: FC<CardType> = ({ _id, attachments, columnId, comments, cover, membe
             )}
           </div>
         </div>
-      )}
+      )} */}
     </div>
   )
 }

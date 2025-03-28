@@ -1,8 +1,7 @@
-import { FC, useMemo, useState } from 'react'
+import { useState } from 'react'
 import Card from './Card'
 import { MoreHorizontal, Plus, X } from 'lucide-react'
-import { ColumnType } from '@/types/data.types'
-import { mapOrder } from '@/utils/sort'
+import { CardType, ColumnType } from '@/types/data.types'
 import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from './ui/dropdown-menu'
@@ -10,7 +9,12 @@ import { Button } from './ui/button'
 import { cn } from '@/lib/utils'
 import { Input } from './ui/input'
 import { toast } from 'react-toastify'
-const Column: FC<ColumnType> = ({ cards, cardOrderIds, _id, title }: ColumnType) => {
+
+type ColumnProps = ColumnType & {
+  createNewCard?: (newCardData: CardType) => void
+}
+
+const Column = ({ cards, cardOrderIds, _id, title, createNewCard = () => {} }: ColumnProps) => {
   const [openNewCardForm, setOpenNewCardForm] = useState(false)
   const [newCardTitle, setNewCardTitle] = useState('')
 
@@ -22,6 +26,13 @@ const Column: FC<ColumnType> = ({ cards, cardOrderIds, _id, title }: ColumnType)
       })
       return
     }
+
+    const newCardData = {
+      title: newCardTitle,
+      columnId: _id
+    } as CardType
+
+    createNewCard(newCardData)
 
     toggleNewCardForm()
     setNewCardTitle('')
@@ -36,7 +47,7 @@ const Column: FC<ColumnType> = ({ cards, cardOrderIds, _id, title }: ColumnType)
   }
 
   // Use useMemo to prevent unnecessary re-ordering on each render
-  const orderCards = useMemo(() => mapOrder(cards, cardOrderIds, '_id'), [cards, cardOrderIds])
+  const orderCards = cards
 
   return (
     <div

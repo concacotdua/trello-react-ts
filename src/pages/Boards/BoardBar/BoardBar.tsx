@@ -2,38 +2,42 @@ import { AvatarCircles } from '@/components/magicui/avatar-circles'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { AVATARS } from '@/constants/data'
-import { BoardType } from '@/types/data.types'
+import { BoardType, CardType, ColumnType } from '@/types/data.types'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { HardDrive, LayoutDashboard, ListFilter, LockIcon, Repeat, UserPlus2 } from 'lucide-react'
+import { UniqueIdentifier } from '@dnd-kit/core'
 
 export type BoardBarProps = {
   board?: BoardType
+  createNewColumn?: (newColumnData: ColumnType) => void
+  createNewCard?: (newCardData: CardType) => void
+  moveColumns?: (dndOrderedColumns: ColumnType[]) => void
+  moveCardsInTheSameColumn?: (dndOrderedCards: CardType[], dndOrderedCardIds: string[], ColumnId: string) => void
+  moveCardToDifferentColumn?: (currentCardId: UniqueIdentifier, prevColumnId: string, nextColumnId: string, dndOrderedColumns: ColumnType[]) => void
 }
 const Chip = [
   {
-    icon: <LayoutDashboard className='mr-2 h-5 w-6 flex-shrink-0 fill-green-200' />,
+    icon: <LayoutDashboard className='mr-2 h-5 w-5 flex-shrink fill-green-200' />,
     label: 'Quang Nguyen Trello - Nqux dev'
   },
   {
-    icon: <LockIcon className='mr-2 h-5 w-6 flex-shrink fill-green-200' />,
+    icon: <LockIcon className='mr-2 h-5 w-5 flex-shrink fill-green-200' />,
     label: 'Public/Private Workspace'
   },
   {
-    icon: <HardDrive className='mr-2 h-5 w-6 fill-green-200' />,
+    icon: <HardDrive className='mr-2 h-5 w-5 flex-shrink fill-green-200' />,
     label: 'Add to Google Drive'
   },
   {
-    icon: <Repeat className='mr-2 h-5 w-6 flex-shrink fill-green-200' />,
+    icon: <Repeat className='mr-2 h-5 w-5 flex-shrink fill-green-200' />,
     label: 'Automatic'
   },
   {
-    icon: <ListFilter className='mr-2 h-5 w-6 flex-shrink fill-green-200' />,
+    icon: <ListFilter className='mr-2 h-5 w-5 flex-shrink fill-green-200' />,
     label: 'Filter'
   }
 ]
 export default function BoardBar({ board }: BoardBarProps) {
-  console.log('board bar: ', board)
-
   return (
     <div className='mb-4 w-full overflow-x-auto px-2'>
       <div className='grid grid-cols-12 gap-2'>

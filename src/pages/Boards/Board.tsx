@@ -24,7 +24,6 @@ import { PlusCircleIcon, X } from 'lucide-react'
 import Column from '@/components/Column'
 import { Button } from '@/components/ui/button'
 import { BoardBarProps } from './BoardBar/BoardBar'
-import { mapOrder } from '@/utils/sort'
 import { CardType, ColumnType } from '@/types/data.types'
 import { ACTIVE_DRAG_ITEM_TYPE } from '@/constants/active'
 import Card from '@/components/Card'
@@ -33,20 +32,27 @@ import { generatePlaceholderCard } from '@/utils/formattext'
 import { Input } from '@/components/ui/input'
 import { toast } from 'react-toastify'
 
-export default function Board({ board }: BoardBarProps) {
+export default function Board({ board, createNewColumn = () => {}, createNewCard, moveColumns = () => {}, moveCardsInTheSameColumn = () => {}, moveCardToDifferentColumn = () => {} }: BoardBarProps) {
   const [orderedColumns, setOrderedColumns] = useState<ColumnType[]>([])
   const [activeDragItemId, setActiveDragItemId] = useState<UniqueIdentifier | null>(null)
   const [activeDragItemType, setActiveDragItemType] = useState<string | null>(null)
   const [activeDragItemData, setActiveDragItemData] = useState<CardType | ColumnType | null>(null)
   const [oldColumnDragCard, setOldColumnDragCard] = useState<ColumnType | null>(null)
-  const [openNewColumnForm, setOpenNewColumnForm] = useState(false)
   const [newColumnTitle, setNewColumnTitle] = useState('')
+  const [openNewColumnForm, setOpenNewColumnForm] = useState(false)
   const toggleNewColumnForm = () => setOpenNewColumnForm(!openNewColumnForm)
-  const addNewColumnTitle = () => {
+
+  const addNewColumnData = () => {
     if (!newColumnTitle) {
-      toast.error('Please enter a title for the new column')
+      toast.error('Hãy nhập title cho cột mới!!')
       return
     }
+    const newColumnData = {
+      title: newColumnTitle
+    } as ColumnType
+
+    createNewColumn(newColumnData)
+
     toggleNewColumnForm()
     setNewColumnTitle('')
   }
@@ -64,11 +70,10 @@ export default function Board({ board }: BoardBarProps) {
   })
   const sensors = useSensors(mouseSensor, touchSensor)
   const lastOverId = useRef<UniqueIdentifier | null>(null)
+
   useEffect(() => {
-    if (!board?.columns) return
-    const ordered = mapOrder(board?.columns as ColumnType[], board?.columnOrderIds || [], '_id')
-    console.log('🔍 orderedColumns:', ordered)
-    setOrderedColumns(ordered)
+    console.log('🔍 board.columns:', board?.columns)
+    setOrderedColumns(board?.columns as ColumnType[])
   }, [board])
 
   const findColumnByCardId = (cardId: string): ColumnType | null => {
@@ -88,7 +93,8 @@ export default function Board({ board }: BoardBarProps) {
     activeColumn: ColumnType,
     overColumn: ColumnType,
     activeDraggingCardId: UniqueIdentifier,
-    activeDraggingCardData: any
+    activeDraggingCardData: any,
+    triggerForm: string
   ): ColumnType[] => {
     const nextColumns = cloneDeep(prevColumns)
 
@@ -130,6 +136,9 @@ export default function Board({ board }: BoardBarProps) {
       nextOverColumn.cardOrderIds = nextOverColumn.cards.map((card) => card._id)
     }
 
+    if (triggerForm === 'handleDragEnd') {
+      moveCardToDifferentColumn(activeDraggingCardId, oldColumnDragCard?._id as string, nextOverColumn?._id as string, nextColumns)
+    }
     return nextColumns
   }
   const handleDragStart = (event: DragStartEvent) => {
@@ -158,7 +167,7 @@ export default function Board({ board }: BoardBarProps) {
     if (!activeColumn || !overColumn) return
 
     if (activeColumn._id !== overColumn._id) {
-      setOrderedColumns((prevColumns) => moveCardBetweenColumns(prevColumns, active, over, activeColumn, overColumn, activeDraggingCardId, activeDraggingCardData))
+      setOrderedColumns((prevColumns) => moveCardBetweenColumns(prevColumns, active, over, activeColumn, overColumn, activeDraggingCardId, activeDraggingCardData, 'handleDragOver'))
     }
   }
   const handleDragEnd = (event: DragEndEvent) => {
@@ -189,21 +198,23 @@ export default function Board({ board }: BoardBarProps) {
         return
       }
       if (oldColumnDragCard?._id !== overColumn._id) {
-        setOrderedColumns((prevColumns) => moveCardBetweenColumns(prevColumns, active, over, activeColumn, overColumn, activeDraggingCardId, activeDraggingCardData))
+        setOrderedColumns((prevColumns) => moveCardBetweenColumns(prevColumns, active, over, activeColumn, overColumn, activeDraggingCardId, activeDraggingCardData, 'handleDragEnd'))
       } else {
         const oldCardIndex = oldColumnDragCard.cards.findIndex((c) => c._id === activeDragItemId)
         const newCardIndex = overColumn.cards.findIndex((c) => c._id === overCardId)
-        const newOrderCard = arrayMove(oldColumnDragCard.cards, oldCardIndex, newCardIndex)
+        const dndOrderedCards = arrayMove(oldColumnDragCard.cards, oldCardIndex, newCardIndex)
+        const dndOrderedCardIds = dndOrderedCards.map((card) => card._id)
 
         setOrderedColumns((prev) => {
           const nextColumns = cloneDeep(prev)
           const targetColumn = nextColumns.find((c) => c._id === overColumn._id)
           if (targetColumn) {
-            targetColumn.cards = newOrderCard
-            targetColumn.cardOrderIds = newOrderCard.map((card) => card._id)
+            targetColumn.cards = dndOrderedCards
+            targetColumn.cardOrderIds = dndOrderedCardIds
           }
           return nextColumns
         })
+        moveCardsInTheSameColumn(dndOrderedCards, dndOrderedCardIds, oldColumnDragCard._id)
       }
     }
     // If there's no valid drop target, reset the state and return
@@ -214,8 +225,10 @@ export default function Board({ board }: BoardBarProps) {
         const oldColumnIndex = orderedColumns.findIndex((c) => c._id === active.id)
         const newColumnIndex = orderedColumns.findIndex((c) => c._id === over.id)
 
-        const newOrderColumn = arrayMove(orderedColumns, oldColumnIndex, newColumnIndex)
-        setOrderedColumns(newOrderColumn)
+        const dndOrderedColumns = arrayMove(orderedColumns, oldColumnIndex, newColumnIndex)
+
+        moveColumns(dndOrderedColumns)
+        setOrderedColumns(dndOrderedColumns)
       }
     }
     // Reset drag state
@@ -267,8 +280,8 @@ export default function Board({ board }: BoardBarProps) {
     <DndContext sensors={sensors} collisionDetection={collisionDetectionStrategy} onDragStart={handleDragStart} onDragOver={handleDragOver} onDragEnd={handleDragEnd}>
       <SortableContext items={orderedColumns.map((c) => c._id) as UniqueIdentifier[]} strategy={horizontalListSortingStrategy}>
         <div className='flex space-x-4 overflow-x-auto pb-4'>
-          {orderedColumns.map((column) => (
-            <Column {...column} key={column._id} />
+          {orderedColumns.map((column: ColumnType) => (
+            <Column {...column} key={column._id} createNewCard={createNewCard} />
           ))}
           <div className='flex-col mt-2'>
             {openNewColumnForm ? (
@@ -284,7 +297,7 @@ export default function Board({ board }: BoardBarProps) {
                     onChange={(e) => setNewColumnTitle(e.target.value)}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
-                        addNewColumnTitle()
+                        addNewColumnData()
                       }
                       if (e.key === 'Escape') {
                         toggleNewColumnForm()
@@ -292,13 +305,18 @@ export default function Board({ board }: BoardBarProps) {
                     }}
                   />
                   <X className='size-6 cursor-pointer text-gray-600 hover:text-gray-800 transition-all duration-300 ease-in-out hover:rotate-90 hover:scale-110' onClick={toggleNewColumnForm} />
-                  <Button variant='outline' className='h-8 w-24 hover:border-green-400 hover:text-green-400' onClick={addNewColumnTitle}>
+                  <Button type='button' variant='outline' className='h-8 w-24 hover:border-green-400 hover:text-green-400' onClick={addNewColumnData}>
                     add column
                   </Button>
                 </div>
               </>
             ) : (
-              <Button variant='outline' className='max-w-[250px] bg-slate-500/50 hover:bg-slate-700/50 transition-all duration-300 ease-in-out transform hover:scale-105' onClick={toggleNewColumnForm}>
+              <Button
+                type='button'
+                variant='outline'
+                className='max-w-[250px] bg-slate-500/50 hover:bg-slate-700/50 transition-all duration-300 ease-in-out transform hover:scale-105'
+                onClick={toggleNewColumnForm}
+              >
                 <PlusCircleIcon className='size-4' />
                 Add new column
               </Button>
